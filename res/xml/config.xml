@@ -28,8 +28,6 @@
         permission on your app, which PhoneGap requires.
     -->
     <preference name="permissions"                value="none"/>
-   <gap:plugin name="org.apache.cordova.core.camera" />
-   <gap:plugin name="org.apache.cordova.core.geolocation" />
 
     <!-- Customize your app and platform with the preference element. -->
     <!-- <preference name="phonegap-version"      value="3.4.0" /> -->      <!-- all: current version of PhoneGap -->
@@ -83,7 +81,9 @@
     <gap:splash src="res/screen/windows-phone/screen-portrait.jpg" gap:platform="winphone" />
     
 
-    <plugin name="Camera"   value="org.apache.cordova.CameraLauncher" />
+    <plugin name="Camera" value="org.apache.cordova.CameraLauncher" /> 
+    <uses-permission
+  android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--
         Define access to external domains.
 

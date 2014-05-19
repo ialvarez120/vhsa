@@ -32,89 +32,70 @@
     <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
 
 <script type="text/javascript" charset="utf-8">
+    //*********************************************************    
+    // initialize the environment
+    //********************************************************* 
+function onConfirm(buttonIndex) {
+  if(buttonIndex == 1) {
+    // User wants to make a photo using the camera
+    sourceType = Camera.PictureSourceType.CAMERA;
+    captureImage();
+  } else if (buttonIndex == 2) {
+    // User wants to select a photo from the gallery
+    sourceType = Camera.PictureSourceType.PHOTOLIBRARY;
+  } else {
+    // cancelled
+  }
+}
 
-    var pictureSource;   // Origen de la imagen
-    var destinationType; // Formato del valor retornado
-
-    // Espera a que PhoneGap conecte con el dispositivo.
-    //
-    document.addEventListener("deviceready",onDeviceReady,false);
-
-    // PhoneGap esta listo para usarse!
-    //
-    function onDeviceReady() {
-        pictureSource=navigator.camera.PictureSourceType;
-        destinationType=navigator.camera.DestinationType;
+function captureImage() {
+  navigator.camera.getPicture(
+    onSuccess,
+    onFail,
+    { quality:60,
+      allowEdit:true, // ignored by Android
+      destinationType:Camera.DestinationType.DATA_URL, //base64
+      encodingType:Camera.EncodingType.JPEG,
+      sourceType:sourceType,
+      targetWidth:160,
+      targetHeight:160
     }
+  );
+}
 
-    // Llamada cuando la foto se retorna sin problemas
-    //
-    function onPhotoDataSuccess(imageData) {
-      // Descomenta esta linea para ver la imagen codificada en base64
-      // console.log(imageData);
 
-      // Obtiene el elemento HTML de la imagen
-      //
-      var smallImage = document.getElementById('smallImage');
+function onSuccess(imageData) {
+  var theImage = "data:image/jpeg;base64,"+imageData;
+ 
+  // immediately change the image in the view
+  clickedImage.src = theImage;
+ 
+  // And now upload the photo to the server
+}
 
-      // Revela el elemento de la imagen
-      //
-      smallImage.style.display = 'block';
-
-      // Muestra la foto capturada
-      // Se usan reglas CSS para dimensionar la imagen
-      //
-      smallImage.src = "data:image/jpeg;base64," + imageData;
+function onSuccess(imageData) {
+  var theImage = "data:image/jpeg;base64,"+imageData;
+ 
+  // immediately change the image in the view
+  clickedImage.src = theImage;
+ 
+  $.mobile.loading('show'); // Show the spinner
+  doPost(
+    '/user/uploadphoto',
+    {
+       'personid': getUser().personID,
+       'photo': imageData
+    },
+    function(data) {
+      if (data.success) {
+        alert('Saving photo succeeded');
+      } else {
+        alert('Saving photo failed');
+      }
+      $.mobile.loading('hide'); // Hide the spinner
     }
-
-    // Llamada cuando la foto se retorna sin problemas
-    //
-    function onPhotoURISuccess(imageURI) {
-      // Descomenta esta linea para ver la ruta URI al fichero de imagen 
-      // console.log(imageURI);
-
-      // Obtiene el elemento HTML de la imagen
-      //
-      var largeImage = document.getElementById('largeImage');
-
-      // Revela el elemento de la imagen
-      //
-      largeImage.style.display = 'block';
-
-      // Muestra la foto capturada
-      // Se usan reglas CSS para dimensionar la imagen
-      //
-      largeImage.src = imageURI;
-    }
-
-    // Un botón llamara a esta función
-    //
-    function capturePhoto() {
-      // Toma la imagen y la retorna como una string codificada en base64
-      navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50 });
-    }
-
-    // Un botón llamara a esta función
-    //
-    function capturePhotoEdit() {
-      // Toma la imagen, permite editarla y la retorna como una string codificada en base64
-      navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20, allowEdit: true }); 
-    }
-
-    // Un botón llamara a esta función
-    //
-    function getPhoto(source) {
-      // Retorna la ruta del fichero de imagen desde el origen especificado
-      navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50, 
-        destinationType: destinationType.FILE_URI,
-        sourceType: source });
-    }
-
-    // Llamado cuando algo malo ocurre
-    // 
-    function onFail(message) {
-      alert('Ocurrió un error: ' + message);
-    }
+  );
+}
 
     </script>
 
@@ -165,16 +146,22 @@
     </div><!-- /header -->
 
     <div role="main" class="ui-content">
-        <p><button onclick="capturePhoto();">Capturar foto</button> <br>
-    <button onclick="capturePhotoEdit();">Capturar foto editable</button> <br>
-    <button onclick="getPhoto(pictureSource.PHOTOLIBRARY);">Desde la librería de imágenes</button><br>
-    <button onclick="getPhoto(pictureSource.SAVEDPHOTOALBUM);">Desde el álbum de fotos</button><br>
-    <img style="display:none;width:60px;height:60px;" id="smallImage" src="" />
-    <img style="display:none;" id="largeImage" src="" /></p>
+       <ul data-role="listview" data-inset="true">
+                <li><a href="#" id="capturePhoneButton" onclick="captureImage()">Capture Photo</a></li>
+                <li><a href="#" id="fromPhotoLibraryButton">From Photo Library</a></li>
+            </ul>
+
+<div data-role="popup" id="popupPhoto" class="ui-content" data-theme="e" data-corners="false">
+                <h5 class="hlabel">Image URI</h5>
+                <p id="pictBox" class="content mesgBox"></p>
+                <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+                <img class="popphoto" id="popImage" src="">
+            </div>
+
     </div><!-- /content -->
 
     <div data-role="footer">
-        <h4> -</h4>
+        <div id="cameraStatus"></div>
     </div><!-- /footer -->
 </div><!-- /page -->
 
@@ -200,10 +187,10 @@
         <!-- fin subpaginas  -->
 
 
-        <script type="text/javascript" src="phonegap.js"></script>
+        <!--<script type="text/javascript" src="phonegap.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
            // app.initialize();
-        </script>
+        </script> -->
     </body>
 </html>
