@@ -33,7 +33,9 @@
   <gap:plugin name="org.apache.cordova.camera" version="0.2.9" />
 <gap:plugin name="org.apache.cordova.geolocation" version="0.3.6" />
 
-
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-feature android:name="android.hardware.camera" />
+<uses-feature android:name="android.hardware.camera.autofocus" />
 
     <!-- Customize your app and platform with the preference element. -->
     <!-- <preference name="phonegap-version"      value="3.4.0" /> -->      <!-- all: current version of PhoneGap -->
@@ -87,7 +89,7 @@
     <gap:splash src="res/screen/windows-phone/screen-portrait.jpg" gap:platform="winphone" />
     
 
-    <plugin name="Camera"   value="org.apache.cordova.CameraLauncher" />
+   
     <!--
         Define access to external domains.
 
