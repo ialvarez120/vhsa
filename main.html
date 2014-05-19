@@ -32,91 +32,39 @@
     <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
 
  <script type="text/javascript" charset="utf-8">
+function captureImage(){
+    //SET LIMIT TO THE NUMBER OF PICTURES YOU WANT TO CAPTURE AT ONCE
+    navigator.device.capture.captureImage(captureImageSuccess, captureError, {limit: 1}); 
+    alert("entro a la camara");   
+}
 
-    var pictureSource;   // picture source
-    var destinationType; // sets the format of returned value
+//ON CAPTURE SUCCESS
+function captureImageSuccess(mediaFiles) {  
+    var i, len;
+    var formatSuccess = function (mediaFile) {
+        //DO SOMETHING ON SUCCESS
+    };
 
-    // Wait for device API libraries to load
-    //
-    document.addEventListener("deviceready",onDeviceReady,false);
+    //IF YOU ARE CAPTURING MULTIPLE FILES
+    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+        mediaFiles[i].getFormatData(formatSuccess, formatError);
+        console.log("path: " + mediaFiles[i].fullPath);
+        console.log("path: " + mediaFiles[i].name);
 
-    // device APIs are available
-    //
-    function onDeviceReady() {
-        pictureSource=navigator.camera.PictureSourceType;
-        destinationType=navigator.camera.DestinationType;
-    }
+        //DO SOMETHING WITH THE CAPTURED FILES
 
-    // Called when a photo is successfully retrieved
-    //
-    function onPhotoDataSuccess(imageData) {
-      // Uncomment to view the base64-encoded image data
-      // console.log(imageData);
+    } 
+    console.log("captureImageSuccess");
+}
 
-      // Get image handle
-      //
-      var smallImage = document.getElementById('smallImage');
-
-      // Unhide image elements
-      //
-      smallImage.style.display = 'block';
-
-      // Show the captured photo
-      // The inline CSS rules are used to resize the image
-      //
-      smallImage.src = "data:image/jpeg;base64," + imageData;
-    }
-
-    // Called when a photo is successfully retrieved
-    //
-    function onPhotoURISuccess(imageURI) {
-      // Uncomment to view the image file URI
-      // console.log(imageURI);
-
-      // Get image handle
-      //
-      var largeImage = document.getElementById('largeImage');
-
-      // Unhide image elements
-      //
-      largeImage.style.display = 'block';
-
-      // Show the captured photo
-      // The inline CSS rules are used to resize the image
-      //
-      largeImage.src = imageURI;
-    }
-
-    // A button will call this function
-    //
-    function capturePhoto() {
-      // Take picture using device camera and retrieve image as base64-encoded string
-      navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50,
-        destinationType: destinationType.DATA_URL });
-    }
-
-    // A button will call this function
-    //
-    function capturePhotoEdit() {
-      // Take picture using device camera, allow edit, and retrieve image as base64-encoded string
-      navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20, allowEdit: true,
-        destinationType: destinationType.DATA_URL });
-    }
-
-    // A button will call this function
-    //
-    function getPhoto(source) {
-      // Retrieve image file location from specified source
-      navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50,
-        destinationType: destinationType.FILE_URI,
-        sourceType: source });
-    }
-
-    // Called if something bad happens.
-    //
-    function onFail(message) {
-      alert('Failed because: ' + message);
-    }
+//error functions
+function captureError(error) {
+    var msg = 'An error occurred during capture: ' + error.code;
+    navigator.notification.alert(msg, null, '');
+}
+function formatError(error) {
+    alert("Error getting file format data: " + error.code); 
+}
 
     </script>
     </head>
@@ -156,7 +104,7 @@
  <ul>
 <li>
   <form id="formulariop">
-       <p class="centrar"><img src="img/tarjeta_puntos.png" /></p>
+       
       <div class="caja_puntos">
             <label> Categoria</label>
              <select name="sgasolinera" id="sgasolinera">
@@ -210,7 +158,7 @@
     <div role="main" class="ui-content">
     
 
-    <button onclick="capturePhoto();">Captura Foto</button> <br>
+    <button onclick="captureImage();">Captura Foto</button> <br>
     <button onclick="capturePhotoEdit();">Captura Foto Editable</button> <br>
     <button onclick="getPhoto(pictureSource.PHOTOLIBRARY);">Abrir de Album</button><br>
     <button onclick="getPhoto(pictureSource.SAVEDPHOTOALBUM);">Abrir del Photo Album</button><br>
