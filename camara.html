@@ -28,6 +28,7 @@
         }
  
         function uploadPhoto(imageURI) {
+          alert(entro a subir fotos)
             var options = new FileUploadOptions();
             options.fileKey="file";
             options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);
@@ -45,8 +46,8 @@
         }
  
         function win(r) {
-            console.log("Code = " + r.responseCode);
-            console.log("Response = " + r.response);
+            alert("Code = " + r.responseCode);
+            alert("Response = " + r.response);
             console.log("Sent = " + r.bytesSent);
             alert(r.response);
         }
