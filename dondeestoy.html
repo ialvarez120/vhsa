@@ -8,44 +8,46 @@
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile.structure-1.4.2.min.css" />
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script> 
 
  <script type="text/javascript" src="phonegap.js"></script>
+<!-- <script type="text/javascript" src="cordova-2.4.0.js"></script>-->
+ 
     <script type="text/javascript" charset="utf-8">
 
-    // Espere a que PhoneGap se inicie
+    // Wait for device API libraries to load
     //
     document.addEventListener("deviceready", onDeviceReady, false);
 
-    // PhoneGap esta listo
-    //
-    function onDeviceReady() {
-        navigator.geolocation.getCurrentPosition(onSuccess, onError);
-    }
+    // device APIs are available
+    function checkLocation() {
+    var win = function(position) {
+        var lat = position.coords.latitude;
+        var long = position.coords.longitude;
+        var myLatlng = new google.maps.LatLng(lat, long);
 
-    // onSuccess Geolocation
-    //
-    function onSuccess(position) {
-        var element = document.getElementById('geolocation');
-        element.innerHTML = 'Latitud: '           + position.coords.latitude              + '<br />' +
-          'Longitud: '        + position.coords.longitude         + '\n' +
-          'Altitud: '         + position.coords.altitude          + '\n' +
-          'Precisión: '       + position.coords.accuracy          + '\n' +
-          'Precisión altitud' + position.coords.altitudeAccuracy  + '\n' +
-          'Dirección: '       + position.coords.heading           + '\n' +
-          'Velocidad: '       + position.coords.speed             + '\n' +
-          'Timestamp: '       + new Date(position.timestamp)      + '\n');
-    }
+        var myOptions = {
+            center: myLatlng,
+            zoom: 16,
+            mapTypeId: google.maps.MapTypeId.HYBRID
+        };
+        map_element = document.getElementById("map_canvas");
+        map = new google.maps.Map(map_element, myOptions);
+    };
 
-    // La función 'callback' onError recibe un objeto `PositionError`.
-    //
-    function onError(error) {
-        alert('código: '    + error.code    + '\n' +
-              'mensaje: ' + error.message + '\n');
-    }
+    var fail = function(e) {
+        $.mobile.hidePageLoadingMsg();
+        alert('Can\'t retrieve position.\nError: ' + e);
+    };
+
+    watchID = navigator.geolocation.getCurrentPosition(win, fail);
+} 
 
     </script>
   </head>
   <body>
-    <p id="geolocation">Buscando geolocalización...</p>
+<div id="map_canvas"></div>
+
+    
   </body>
 </html>
