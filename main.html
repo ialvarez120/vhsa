@@ -43,6 +43,17 @@
     function onDeviceReady() {
         pictureSource = navigator.camera.PictureSourceType;
         destinationType = navigator.camera.DestinationType;
+
+         // localstorage
+        window.localStorage.setItem("key", "value");
+        var keyname = window.localStorage.key(i);
+        // keyname is now equal to "key"
+        var value = window.localStorage.getItem("key");
+        // value is now equal to "value"
+        window.localStorage.removeItem("key");
+        window.localStorage.setItem("key2", "value2");
+        window.localStorage.clear();
+        // localStorage is now empty
     }
 
     // Called when a photo is successfully retrieved
@@ -162,9 +173,10 @@ alert(imageURI)
 <li class="btn_contacto"><a href="#manual">Manual</a></li>
 <li class="btn_contacto"><a href="camara.html" rel="external">Camara</a></li>
 <li class="btn_contacto"><a href="dondeestoy.html" rel="external">Donde Estoy?</a></li>
-
-
 </ul>
+<h1>Tus datos</h1>
+<p>localStorage</p>
+
 </div>
     </div>
 </div>
